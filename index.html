@@ -3,103 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ChoreoLabs</title>
-  <meta name="description" content="ChoreoLabs — building thoughtful software, choreographed end to end.">
-  <meta property="og:title" content="ChoreoLabs">
-  <meta property="og:description" content="Building thoughtful software, choreographed end to end.">
+  <title>Choreo Labs</title>
+  <meta property="og:title" content="Choreo Labs">
+  <meta property="og:image" content="https://choreolabs.ink/choreolabs.jpg">
   <meta property="og:url" content="https://choreolabs.ink/">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='%237c5cff'/><text x='50' y='66' font-size='46' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'>C</text></svg>">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0b0b12;
-      --fg: #f4f4f8;
-      --muted: #a0a0b4;
-      --accent: #7c5cff;
-      --accent-2: #22d3ee;
-      --card: rgba(255,255,255,0.04);
-      --border: rgba(255,255,255,0.08);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
-    body {
-      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-    .glow {
-      position: fixed; inset: -20%;
-      background:
-        radial-gradient(40% 40% at 25% 30%, rgba(124,92,255,0.28), transparent 70%),
-        radial-gradient(35% 35% at 75% 70%, rgba(34,211,238,0.18), transparent 70%);
-      filter: blur(40px);
-      animation: drift 18s ease-in-out infinite alternate;
-      z-index: -1;
-    }
-    @keyframes drift { to { transform: translate(4%, -3%) scale(1.05); } }
-    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
-    header { display: flex; justify-content: space-between; align-items: center; padding: 28px 0; }
-    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em; }
-    .logo span.dot { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
-    nav a { color: var(--muted); text-decoration: none; margin-left: 22px; font-size: .95rem; }
-    nav a:hover { color: var(--fg); }
-    .hero { padding: 96px 0 72px; text-align: center; }
-    .pill { display: inline-block; padding: 6px 14px; border: 1px solid var(--border); border-radius: 999px; color: var(--muted); font-size: .85rem; margin-bottom: 26px; background: var(--card); }
-    h1 { font-size: clamp(2.4rem, 6vw, 4.4rem); line-height: 1.05; letter-spacing: -0.04em; font-weight: 800; }
-    h1 .grad { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero p { color: var(--muted); font-size: 1.15rem; max-width: 620px; margin: 22px auto 36px; }
-    .btn { display: inline-block; padding: 13px 26px; border-radius: 12px; font-weight: 600; text-decoration: none; transition: transform .15s ease, opacity .15s ease; }
-    .btn:hover { transform: translateY(-2px); }
-    .btn.primary { background: linear-gradient(90deg, var(--accent), #9b7bff); color: #fff; }
-    .btn.ghost { border: 1px solid var(--border); color: var(--fg); margin-left: 10px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; padding: 40px 0 90px; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 26px; }
-    .card .ico { font-size: 1.6rem; margin-bottom: 12px; }
-    .card h3 { font-size: 1.1rem; margin-bottom: 8px; }
-    .card p { color: var(--muted); font-size: .95rem; }
-    footer { border-top: 1px solid var(--border); padding: 28px 0; color: var(--muted); font-size: .88rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-    footer a { color: var(--muted); }
-    @media (max-width: 560px) {
-      nav { display: none; }
-      .btn.ghost { margin: 12px 0 0; }
-      .hero { padding-top: 56px; }
-    }
+    html, body { margin: 0; height: 100%; background: #14123a; }
+    body { display: flex; align-items: center; justify-content: center; }
+    img { display: block; max-width: 100%; max-height: 100vh; object-fit: contain; }
   </style>
 </head>
 <body>
-  <div class="glow" aria-hidden="true"></div>
-  <div class="wrap">
-    <header>
-      <div class="logo"><span class="dot"></span>ChoreoLabs</div>
-      <nav>
-        <a href="#work">What we do</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </header>
-
-    <section class="hero">
-      <div class="pill">✨ Something new is in motion</div>
-      <h1>Software, <span class="grad">choreographed</span>.</h1>
-      <p>ChoreoLabs designs and builds products where every moving part works in step: clean interfaces, reliable systems, and AI that actually helps.</p>
-      <a class="btn primary" href="#contact">Get in touch</a>
-      <a class="btn ghost" href="https://github.com/HasinduNimesh" target="_blank" rel="noopener">GitHub</a>
-    </section>
-
-    <section id="work" class="grid">
-      <div class="card"><div class="ico">🎨</div><h3>Product design</h3><p>Interfaces that feel effortless, from first sketch to polished release.</p></div>
-      <div class="card"><div class="ico">⚙️</div><h3>Engineering</h3><p>Web apps, APIs, and infrastructure built to stay fast and stable.</p></div>
-      <div class="card"><div class="ico">🤖</div><h3>Applied AI</h3><p>Practical AI features and agents woven into real workflows.</p></div>
-    </section>
-
-    <footer id="contact">
-      <span>© <span id="y"></span> ChoreoLabs · choreolabs.ink</span>
-      <span><a href="https://github.com/HasinduNimesh" target="_blank" rel="noopener">github.com/HasinduNimesh</a></span>
-    </footer>
-  </div>
-  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+  <img src="choreolabs.jpg" alt="The Choreo Labs team on stage in front of the Choreo Labs backdrop" width="2400" height="1600">
 </body>
 </html>
