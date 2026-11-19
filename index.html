@@ -4,16 +4,473 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Choreo Labs</title>
-  <meta property="og:title" content="Choreo Labs">
+  <meta name="description" content="Can you out-dance Dotty? A tiny dance-off game from Choreo Labs.">
+  <meta property="og:title" content="Choreo Labs: Dance-off with Dotty">
+  <meta property="og:description" content="Dotty shows the moves. You copy them. How far can you go?">
   <meta property="og:image" content="https://choreolabs.ink/choreolabs.jpg">
   <meta property="og:url" content="https://choreolabs.ink/">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='white' stroke='%231b1f5e' stroke-width='8'/><circle cx='36' cy='44' r='7' fill='%231b1f5e'/><circle cx='64' cy='44' r='7' fill='%231b1f5e'/><path d='M32 62 Q50 80 68 62' stroke='%231b1f5e' stroke-width='7' fill='none' stroke-linecap='round'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    html, body { margin: 0; height: 100%; background: #14123a; }
-    body { display: flex; align-items: center; justify-content: center; }
-    img { display: block; max-width: 100%; max-height: 100vh; object-fit: contain; }
+    :root {
+      --navy: #1b1f5e;
+      --ink: #14123a;
+      --purple: #7b6cf6;
+      --cyan: #4cc9f0;
+      --yellow: #ffd23f;
+      --pink: #ff6b9d;
+      --white: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      font-family: "Fredoka", system-ui, sans-serif;
+      color: var(--white);
+      background: radial-gradient(120% 80% at 50% 0%, #4a3f8a 0%, #24206a 45%, var(--ink) 100%) fixed;
+      background-color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 28px 16px 40px; }
+
+    /* ---------- hero ---------- */
+    h1 {
+      font-size: clamp(2.2rem, 7vw, 3.6rem);
+      margin: 6px 0 22px;
+      text-align: center;
+      letter-spacing: -0.01em;
+      text-shadow: 0 4px 0 var(--navy), 0 8px 18px rgba(0,0,0,.35);
+    }
+    h1 .wave { display: inline-block; animation: wave 2.4s ease-in-out infinite; transform-origin: 70% 70%; }
+    @keyframes wave { 0%,60%,100% { transform: rotate(0) } 10%,30% { transform: rotate(16deg) } 20%,40% { transform: rotate(-8deg) } }
+
+    .polaroid {
+      margin: 0 auto;
+      max-width: 640px;
+      background: var(--white);
+      padding: 12px 12px 14px;
+      border-radius: 6px;
+      box-shadow: 0 8px 0 var(--navy), 0 22px 40px rgba(0,0,0,.45);
+      transform: rotate(-2deg);
+      position: relative;
+      transition: transform .3s cubic-bezier(.3,1.6,.5,1);
+    }
+    .polaroid:hover { transform: rotate(0deg) scale(1.02); }
+    .polaroid::before {
+      content: ""; position: absolute; top: -14px; left: 50%; width: 110px; height: 28px;
+      transform: translateX(-50%) rotate(3deg);
+      background: rgba(255, 210, 63, .85);
+      border-radius: 3px;
+    }
+    .polaroid img { display: block; width: 100%; height: auto; border-radius: 3px; }
+    .polaroid figcaption { color: var(--navy); text-align: center; font-weight: 600; font-size: 1.15rem; padding-top: 10px; }
+
+    /* ---------- game ---------- */
+    .game { margin-top: 56px; text-align: center; }
+    h2 { font-size: clamp(1.7rem, 5vw, 2.4rem); margin: 0 0 6px; text-shadow: 0 3px 0 var(--navy); }
+    h2 span { color: var(--yellow); }
+    .sub { margin: 0 auto 20px; max-width: 520px; opacity: .85; font-size: 1.05rem; }
+
+    .stage {
+      position: relative;
+      height: 380px;
+      max-width: 620px;
+      margin: 0 auto;
+      border-radius: 28px;
+      border: 5px solid var(--navy);
+      background:
+        radial-gradient(50% 60% at 50% 100%, rgba(123,108,246,.55), transparent 70%),
+        linear-gradient(#3a3480, #1d1a57 70%);
+      box-shadow: 0 8px 0 var(--navy), 0 24px 50px rgba(0,0,0,.4);
+      overflow: hidden;
+    }
+    .stage.shake { animation: shake .45s; }
+    @keyframes shake { 20%,60% { transform: translateX(-8px) } 40%,80% { transform: translateX(8px) } }
+
+    .hud {
+      position: absolute; top: 12px; left: 14px; right: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 600; font-size: 1rem; z-index: 3;
+    }
+    .hud .chip { background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.2); padding: 4px 12px; border-radius: 999px; }
+    .hud b { color: var(--yellow); }
+    .hud button {
+      font: inherit; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.2);
+      color: var(--white); border-radius: 999px; padding: 4px 10px; cursor: pointer;
+    }
+
+    .bubble {
+      position: absolute; top: 56px; left: 50%; transform: translateX(-50%);
+      background: var(--white); color: var(--navy);
+      border: 4px solid var(--navy); border-radius: 20px;
+      padding: 8px 16px; font-weight: 600; font-size: 1.05rem;
+      max-width: 86%; width: max-content; z-index: 2;
+      box-shadow: 0 4px 0 var(--navy);
+    }
+    .bubble::after {
+      content: ""; position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%);
+      border: 10px solid transparent; border-top-color: var(--navy); border-bottom: 0;
+    }
+    .bubble.pop { animation: pop .35s cubic-bezier(.3,1.8,.5,1); }
+    @keyframes pop { from { transform: translateX(-50%) scale(.6); } to { transform: translateX(-50%) scale(1); } }
+
+    .dotty { position: absolute; left: 50%; bottom: 34px; width: 190px; transform: translateX(-50%); z-index: 1; }
+    .dotty svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .dotty .bob, .dotty .rig, .dotty .armL, .dotty .armR, .dotty .legL, .dotty .legR, .dotty .pupils, .dotty .eyes {
+      transform-box: view-box;
+    }
+    .dotty .bob { animation: bob 1.1s ease-in-out infinite; }
+    @keyframes bob { 50% { transform: translateY(-6px); } }
+    .dotty .rig { transform-origin: 100px 220px; transition: transform .14s cubic-bezier(.3,1.6,.5,1); }
+    .dotty .armL { transform-origin: 48px 112px; transition: transform .14s cubic-bezier(.3,1.6,.5,1); }
+    .dotty .armR { transform-origin: 152px 112px; transition: transform .14s cubic-bezier(.3,1.6,.5,1); }
+    .dotty .legL { transform-origin: 88px 165px; transition: transform .14s cubic-bezier(.3,1.6,.5,1); }
+    .dotty .legR { transform-origin: 112px 165px; transition: transform .14s cubic-bezier(.3,1.6,.5,1); }
+    .dotty .pupils { transition: transform .12s; }
+    .dotty .eyes { transform-origin: 100px 98px; animation: blink 4s infinite; }
+    @keyframes blink { 0%,94%,100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
+
+    .dotty[data-pose="up"] .rig { transform: translateY(-38px); }
+    .dotty[data-pose="up"] .armL { transform: rotate(125deg); }
+    .dotty[data-pose="up"] .armR { transform: rotate(-125deg); }
+    .dotty[data-pose="up"] .legL { transform: rotate(22deg); }
+    .dotty[data-pose="up"] .legR { transform: rotate(-22deg); }
+    .dotty[data-pose="up"] .pupils { transform: translateY(-4px); }
+
+    .dotty[data-pose="down"] .rig { transform: translateY(16px) scale(1.14, .82); }
+    .dotty[data-pose="down"] .armL { transform: rotate(45deg); }
+    .dotty[data-pose="down"] .armR { transform: rotate(-45deg); }
+    .dotty[data-pose="down"] .legL { transform: rotate(35deg); }
+    .dotty[data-pose="down"] .legR { transform: rotate(-35deg); }
+    .dotty[data-pose="down"] .pupils { transform: translateY(4px); }
+
+    .dotty[data-pose="left"] .rig { transform: translateX(-30px) rotate(-12deg); }
+    .dotty[data-pose="left"] .armL { transform: rotate(55deg); }
+    .dotty[data-pose="left"] .armR { transform: rotate(-150deg); }
+    .dotty[data-pose="left"] .legL { transform: rotate(32deg); }
+    .dotty[data-pose="left"] .pupils { transform: translateX(-5px); }
+
+    .dotty[data-pose="right"] .rig { transform: translateX(30px) rotate(12deg); }
+    .dotty[data-pose="right"] .armR { transform: rotate(-55deg); }
+    .dotty[data-pose="right"] .armL { transform: rotate(150deg); }
+    .dotty[data-pose="right"] .legR { transform: rotate(-32deg); }
+    .dotty[data-pose="right"] .pupils { transform: translateX(5px); }
+
+    .dotty[data-pose="faint"] .bob { animation: none; }
+    .dotty[data-pose="faint"] .rig { transform: translateY(-34px) rotate(84deg); transition: transform .6s cubic-bezier(.5,-0.4,.6,1.4); }
+    .dotty[data-pose="faint"] .armL { transform: rotate(-20deg); }
+    .dotty[data-pose="faint"] .armR { transform: rotate(30deg); }
+
+    .dotty .eyes-x, .dotty .mouth-wow, .dotty .mouth-sad { display: none; }
+    .dotty[data-mood="wow"] .mouth-happy { display: none; }
+    .dotty[data-mood="wow"] .mouth-wow { display: inline; }
+    .dotty[data-mood="sad"] .mouth-happy, .dotty[data-mood="sad"] .eyes { display: none; }
+    .dotty[data-mood="sad"] .mouth-sad, .dotty[data-mood="sad"] .eyes-x { display: inline; }
+
+    .floor { position: absolute; left: 0; right: 0; bottom: 0; height: 30px; background: #15124a; border-top: 4px solid var(--navy); }
+    .leds { display: flex; justify-content: space-around; padding: 0 10px; position: relative; top: -7px; }
+    .leds span { width: 10px; height: 10px; border-radius: 50%; background: #c9c3ff; box-shadow: 0 0 10px 3px rgba(150,140,255,.7); opacity: .55; }
+    .leds.beat span { animation: beat .3s ease-out; }
+    .leds.beat span:nth-child(odd) { animation-delay: .04s; }
+    @keyframes beat { 0% { opacity: 1; transform: scale(1.5); background: var(--yellow); box-shadow: 0 0 16px 6px rgba(255,210,63,.8); } }
+
+    .confetti { position: absolute; top: -12px; width: 12px; height: 7px; border-radius: 50%; z-index: 4; animation: fall 1.7s ease-in forwards; pointer-events: none; }
+    @keyframes fall { to { transform: translate(var(--dx), 420px) rotate(var(--r)); opacity: .3; } }
+
+    .pads {
+      display: grid;
+      grid-template-columns: repeat(3, 84px);
+      grid-template-areas: ". up ." "left down right";
+      gap: 12px; justify-content: center; margin: 26px auto 0;
+      touch-action: manipulation; user-select: none; -webkit-user-select: none;
+    }
+    .pad {
+      width: 84px; height: 84px; border-radius: 22px;
+      border: 5px solid var(--navy); color: var(--navy);
+      font-size: 2.2rem; font-weight: 700; font-family: inherit; line-height: 1;
+      box-shadow: 0 7px 0 var(--navy);
+      cursor: pointer; transition: transform .08s, box-shadow .08s, filter .08s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pad[data-dir="up"] { grid-area: up; background: var(--yellow); }
+    .pad[data-dir="left"] { grid-area: left; background: var(--pink); }
+    .pad[data-dir="down"] { grid-area: down; background: var(--cyan); }
+    .pad[data-dir="right"] { grid-area: right; background: var(--purple); color: var(--white); }
+    .pad.lit, .pad:active { transform: translateY(6px); box-shadow: 0 1px 0 var(--navy); filter: brightness(1.25); }
+    .game.your-turn .pad { animation: nudge 1.2s ease-in-out infinite; }
+    @keyframes nudge { 50% { filter: brightness(1.12); } }
+
+    .start {
+      margin-top: 26px; font: inherit; font-weight: 700; font-size: 1.25rem;
+      background: var(--yellow); color: var(--navy);
+      border: 5px solid var(--navy); border-radius: 999px; padding: 12px 28px;
+      box-shadow: 0 7px 0 var(--navy); cursor: pointer;
+      transition: transform .08s, box-shadow .08s;
+    }
+    .start:hover { transform: translateY(-2px); box-shadow: 0 9px 0 var(--navy); }
+    .start:active { transform: translateY(6px); box-shadow: 0 1px 0 var(--navy); }
+    .keys { margin-top: 14px; opacity: .7; font-size: .95rem; }
+    kbd { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); border-radius: 6px; padding: 1px 6px; font-family: inherit; }
+
+    footer { text-align: center; opacity: .55; font-size: .9rem; margin-top: 48px; }
+
+    @media (max-width: 480px) {
+      .stage { height: 340px; }
+      .dotty { width: 160px; }
+      .pads { grid-template-columns: repeat(3, 76px); }
+      .pad { width: 76px; height: 76px; }
+      .keys { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .dotty .bob, h1 .wave, .dotty .eyes { animation: none; }
+    }
   </style>
 </head>
 <body>
-  <img src="choreolabs.jpg" alt="The Choreo Labs team on stage in front of the Choreo Labs backdrop" width="2400" height="1600">
+  <div class="wrap">
+    <h1>Choreo Labs <span class="wave">👋</span></h1>
+    <figure class="polaroid">
+      <img src="choreolabs.jpg" alt="The Choreo Labs team on stage in front of the Choreo Labs backdrop" width="2400" height="1600">
+      <figcaption>the crew 💙</figcaption>
+    </figure>
+
+    <section class="game" id="game">
+      <h2>Dance-off with <span>Dotty</span></h2>
+      <p class="sub">Dotty shows the moves, you copy them. Every round adds a move and speeds up. How long can you keep up?</p>
+
+      <div class="stage" id="stage">
+        <div class="hud">
+          <span class="chip">Level <b id="level">0</b></span>
+          <button id="sound" type="button" aria-label="Toggle sound">🔊</button>
+          <span class="chip">Best <b id="best">0</b></span>
+        </div>
+        <div class="bubble" id="bubble">Psst… wanna dance? 🕺</div>
+
+        <div class="dotty" id="dotty" data-pose="idle" data-mood="happy" aria-hidden="true">
+          <svg viewBox="0 0 200 240">
+            <g class="bob"><g class="rig">
+              <g class="legL"><line x1="88" y1="165" x2="80" y2="214" stroke="#1b1f5e" stroke-width="14" stroke-linecap="round"/><line x1="88" y1="165" x2="80" y2="214" stroke="#fff" stroke-width="6" stroke-linecap="round"/><ellipse cx="74" cy="218" rx="15" ry="9" fill="#1b1f5e"/></g>
+              <g class="legR"><line x1="112" y1="165" x2="120" y2="214" stroke="#1b1f5e" stroke-width="14" stroke-linecap="round"/><line x1="112" y1="165" x2="120" y2="214" stroke="#fff" stroke-width="6" stroke-linecap="round"/><ellipse cx="126" cy="218" rx="15" ry="9" fill="#1b1f5e"/></g>
+              <g class="armL"><line x1="48" y1="112" x2="20" y2="148" stroke="#1b1f5e" stroke-width="14" stroke-linecap="round"/><line x1="48" y1="112" x2="20" y2="148" stroke="#fff" stroke-width="6" stroke-linecap="round"/><circle cx="18" cy="151" r="10" fill="#fff" stroke="#1b1f5e" stroke-width="5"/></g>
+              <g class="armR"><line x1="152" y1="112" x2="180" y2="148" stroke="#1b1f5e" stroke-width="14" stroke-linecap="round"/><line x1="152" y1="112" x2="180" y2="148" stroke="#fff" stroke-width="6" stroke-linecap="round"/><circle cx="182" cy="151" r="10" fill="#fff" stroke="#1b1f5e" stroke-width="5"/></g>
+              <circle cx="100" cy="110" r="58" fill="#fff" stroke="#1b1f5e" stroke-width="6"/>
+              <ellipse cx="100" cy="47" rx="16" ry="5" fill="#1b1f5e" opacity=".9"/>
+              <ellipse cx="66" cy="124" rx="9" ry="5" fill="#ff6b9d" opacity=".7"/>
+              <ellipse cx="134" cy="124" rx="9" ry="5" fill="#ff6b9d" opacity=".7"/>
+              <g class="eyes">
+                <ellipse cx="80" cy="98" rx="12" ry="15" fill="#fff" stroke="#1b1f5e" stroke-width="4"/>
+                <ellipse cx="120" cy="98" rx="12" ry="15" fill="#fff" stroke="#1b1f5e" stroke-width="4"/>
+                <g class="pupils"><circle cx="82" cy="101" r="6" fill="#1b1f5e"/><circle cx="122" cy="101" r="6" fill="#1b1f5e"/></g>
+              </g>
+              <g class="eyes-x" stroke="#1b1f5e" stroke-width="5" stroke-linecap="round">
+                <path d="M71 90 L89 108 M89 90 L71 108"/><path d="M111 90 L129 108 M129 90 L111 108"/>
+              </g>
+              <path class="mouth-happy" d="M82 123 Q100 148 118 123 Z" fill="#1b1f5e" stroke="#1b1f5e" stroke-width="4" stroke-linejoin="round"/>
+              <ellipse class="mouth-wow" cx="100" cy="133" rx="9" ry="12" fill="#1b1f5e"/>
+              <path class="mouth-sad" d="M83 140 Q100 124 117 140" fill="none" stroke="#1b1f5e" stroke-width="6" stroke-linecap="round"/>
+            </g></g>
+          </svg>
+        </div>
+
+        <div class="floor"><div class="leds" id="leds"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+      </div>
+
+      <div class="pads" id="pads">
+        <button class="pad" type="button" data-dir="up" aria-label="Up">↑</button>
+        <button class="pad" type="button" data-dir="left" aria-label="Left">←</button>
+        <button class="pad" type="button" data-dir="down" aria-label="Down">↓</button>
+        <button class="pad" type="button" data-dir="right" aria-label="Right">→</button>
+      </div>
+
+      <button class="start" id="start" type="button">Let's dance! 🕺</button>
+      <div class="keys">Use <kbd>←</kbd> <kbd>↑</kbd> <kbd>↓</kbd> <kbd>→</kbd> or <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
+    </section>
+
+    <footer>choreolabs.ink · no Dottys were harmed in the making of this game</footer>
+  </div>
+
+  <script>
+  (() => {
+    const $ = (id) => document.getElementById(id);
+    const game = $('game'), stage = $('stage'), dotty = $('dotty'), bubble = $('bubble');
+    const levelEl = $('level'), bestEl = $('best'), startBtn = $('start'), soundBtn = $('sound'), leds = $('leds');
+    const DIRS = ['left', 'up', 'down', 'right'];
+    const NOTES = { left: 261.6, down: 329.6, up: 392.0, right: 523.3 };
+    const KEYS = { ArrowLeft: 'left', ArrowUp: 'up', ArrowDown: 'down', ArrowRight: 'right', a: 'left', w: 'up', s: 'down', d: 'right' };
+
+    const WIN = [
+      'Smooth like a clean deploy 🚀', 'Those hips passed code review ✅', 'Nailed it! Dotty is shook 😳',
+      'Zero bugs in those moves 🐞❌', 'Ship it! 📦', 'Okay show-off 😎', 'Choreographed to perfection 💃',
+    ];
+    const MILESTONE = [
+      'LEGENDARY! Dotty is calling the team over 📣', 'Certified Choreo-grapher 🏆', 'Somebody give this human a raise 💸',
+    ];
+    const FAIL = [
+      'That move threw a 500 Internal Dance Error 💥', 'You danced like a merge conflict 😵', '404: rhythm not found 🕺',
+      'Dotty fainted from second-hand embarrassment', 'Have you tried turning your feet off and on again?',
+      'That was… a choice 🫠', 'Bold of you to freestyle in a choreo battle', 'Dotty needs a moment. And a nap.',
+    ];
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    let best = 0, muted = false;
+    try { best = parseInt(localStorage.getItem('dotty-best'), 10) || 0; muted = localStorage.getItem('dotty-muted') === '1'; } catch (e) {}
+    bestEl.textContent = best;
+    soundBtn.textContent = muted ? '🔇' : '🔊';
+
+    // ---------- sound ----------
+    let ac;
+    function audio() {
+      if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } }
+      if (ac.state === 'suspended') ac.resume();
+      return ac;
+    }
+    function tone(freq, dur = 0.18, type = 'triangle', vol = 0.28) {
+      if (muted) return;
+      const a = audio(); if (!a) return;
+      const o = a.createOscillator(), g = a.createGain(), t = a.currentTime;
+      o.type = type; o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur);
+    }
+    function wahWah() {
+      if (muted) return;
+      const a = audio(); if (!a) return;
+      [0, 0.32, 0.64].forEach((offset, i) => {
+        const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + offset, len = i === 2 ? 0.9 : 0.28;
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(311 - i * 30, t);
+        o.frequency.exponentialRampToValueAtTime(220 - i * 40, t + len);
+        g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.001, t + len + 0.05);
+        o.connect(g).connect(a.destination); o.start(t); o.stop(t + len + 0.1);
+      });
+    }
+    function fanfare() { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tone(f, 0.16, 'square', 0.1), i * 90)); }
+
+    // ---------- visuals ----------
+    function say(text) { bubble.textContent = text; bubble.classList.remove('pop'); void bubble.offsetWidth; bubble.classList.add('pop'); }
+    const pose = (p) => { dotty.dataset.pose = p; };
+    const mood = (m) => { dotty.dataset.mood = m; };
+    function move(dir) {
+      pose(dir);
+      const pad = document.querySelector(`.pad[data-dir="${dir}"]`);
+      pad.classList.add('lit'); setTimeout(() => pad.classList.remove('lit'), 170);
+      leds.classList.remove('beat'); void leds.offsetWidth; leds.classList.add('beat');
+      tone(NOTES[dir]);
+    }
+    function confetti(n = 60) {
+      const colors = ['#ffd23f', '#ff6b9d', '#4cc9f0', '#7b6cf6', '#ffffff'];
+      for (let i = 0; i < n; i++) {
+        const c = document.createElement('span');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + '%';
+        c.style.background = colors[i % colors.length];
+        c.style.setProperty('--dx', (Math.random() * 160 - 80) + 'px');
+        c.style.setProperty('--r', (Math.random() * 720 - 360) + 'deg');
+        c.style.animationDelay = Math.random() * 0.3 + 's';
+        stage.appendChild(c);
+        setTimeout(() => c.remove(), 2200);
+      }
+    }
+
+    // ---------- game ----------
+    let state = 'idle'; // idle | showing | input | over
+    let seq = [], idx = 0, level = 0, run = 0;
+
+    async function start() {
+      audio();
+      const my = ++run;
+      seq = []; level = 0; levelEl.textContent = 0;
+      stage.classList.remove('shake');
+      mood('happy'); pose('idle');
+      startBtn.textContent = 'Restart 🔁';
+      say('Ready? Eyes on me! 👀');
+      state = 'showing';
+      await sleep(900);
+      if (my === run) nextRound(my);
+    }
+
+    async function nextRound(my) {
+      level++; levelEl.textContent = level;
+      seq.push(DIRS[Math.floor(Math.random() * 4)]);
+      state = 'showing'; game.classList.remove('your-turn');
+      mood('wow');
+      say(level === 1 ? 'Watch this…' : `Level ${level}! Watch…`);
+      await sleep(650);
+      const speed = Math.max(210, 520 - level * 22);
+      for (const dir of seq) {
+        if (my !== run) return;
+        move(dir);
+        await sleep(speed);
+        pose('idle');
+        await sleep(Math.max(80, speed * 0.35));
+      }
+      if (my !== run) return;
+      idx = 0; state = 'input'; mood('happy');
+      game.classList.add('your-turn');
+      say(`Your turn! ${seq.length} move${seq.length > 1 ? 's' : ''} 🫵`);
+    }
+
+    function press(dir) {
+      if (state === 'idle') { // freestyle before the game starts
+        move(dir); setTimeout(() => state === 'idle' && pose('idle'), 180);
+        return;
+      }
+      if (state !== 'input') return;
+      move(dir);
+      setTimeout(() => { if (state === 'input' && dotty.dataset.pose === dir) pose('idle'); }, 170);
+      if (dir !== seq[idx]) return fail();
+      idx++;
+      if (idx === seq.length) {
+        const my = run;
+        state = 'showing'; game.classList.remove('your-turn');
+        if (level % 5 === 0) { fanfare(); confetti(); say(pick(MILESTONE)); }
+        else say(pick(WIN));
+        setTimeout(() => { if (my === run) nextRound(my); }, 950);
+      }
+    }
+
+    function fail() {
+      run++; state = 'over';
+      game.classList.remove('your-turn');
+      mood('sad');
+      setTimeout(() => pose('faint'), 120);
+      stage.classList.remove('shake'); void stage.offsetWidth; stage.classList.add('shake');
+      wahWah();
+      const score = level - 1;
+      if (score > best) {
+        best = score; bestEl.textContent = best;
+        try { localStorage.setItem('dotty-best', best); } catch (e) {}
+        say(`New best: ${score}! But also… ${pick(FAIL)}`);
+        setTimeout(() => confetti(30), 400);
+      } else {
+        say(pick(FAIL));
+      }
+      startBtn.textContent = 'Revive Dotty 🔁';
+    }
+
+    // ---------- input ----------
+    document.querySelectorAll('.pad').forEach((pad) => {
+      pad.addEventListener('pointerdown', (e) => { e.preventDefault(); press(pad.dataset.dir); });
+      pad.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); press(pad.dataset.dir); } });
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+      const dir = KEYS[e.key] || KEYS[e.key.toLowerCase()];
+      if (!dir) return;
+      if (state === 'showing' || state === 'input') e.preventDefault();
+      if (state === 'input') press(dir);
+    });
+    startBtn.addEventListener('click', start);
+    soundBtn.addEventListener('click', () => {
+      muted = !muted; soundBtn.textContent = muted ? '🔇' : '🔊';
+      try { localStorage.setItem('dotty-muted', muted ? '1' : '0'); } catch (e) {}
+    });
+    dotty.addEventListener('click', () => { if (state === 'idle') { say(pick(['Hehe, that tickles! 😆', 'Boop! 👉', 'Press the big yellow button!'])); tone(880, 0.1); } });
+  })();
+  </script>
 </body>
 </html>
